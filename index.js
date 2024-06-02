@@ -25,15 +25,17 @@ async function run() {
         await client.connect();
 
         const database = client.db("Travelism");
-        const collection = database.collection("users");
+        const collectionUser = database.collection("users");
+        const collectionPost = database.collection("posts");
 
         app.post("/api/v1/insert/user", async (req, res) => {
             console.log(req.body.userID);
             const doc = req.body;
-            const allUsers = await collection.find({}).toArray();
+            const allUsers = await collectionUser.find({}).toArray();
             const isUserExist = allUsers.some(
                 (user) => user.userID === doc.userID
             );
+            const numberOfElements = Object.keys(doc).length;
 
             if (!doc) {
                 res.header("status", "400");
@@ -52,48 +54,52 @@ async function run() {
                 console.log("User already exists");
                 res.send({status: 400, message: "User already exists"});
             } else {
-                const result = await collection.insertOne(doc);
-                res.header("status", "200");
-                res.send(result);
-                console.log(
-                    `A document was inserted with the _id: ${result.insertedId}`
-                );
+                if (numberOfElements === 5) {
+                    const result = await collectionUser.insertOne(doc);
+                    res.header("status", "200");
+                    res.send(result);
+                    console.log(
+                        `A document was inserted with the _id: ${result.insertedId}`
+                    );
+                } else {
+                    res.header("status", "400");
+                    console.log("Invalid input 4");
+                    res.send({status: 400, message: "Invalid input"});
+                }
             }
         });
 
-        app.put("/api/v1/update/data", async (req, res) => {
+        app.post("/api/v1/insert/post", async (req, res) => {
             console.log(req.body.userID);
             const doc = req.body;
+            const allUsers = await collectionUser.find({}).toArray();
+
+            const isUserExistID = allUsers.some(
+                (user) => user.userID === doc.userID
+            );
+            const isUserExistEmail = allUsers.some(
+                (user) => user.userEmail === doc.userEmail
+            );
+            const isUserExist = isUserExistID && isUserExistEmail;
+
             if (!doc) {
                 res.header("status", "400");
                 console.log("Invalid input 1");
-                res.send("Invalid input");
+                res.send({status: 400, message: "Invalid input"});
             } else if (!doc.userID) {
                 res.header("status", "400");
                 console.log("Invalid input 2");
-                res.send("Invalid input");
+                res.send({status: 400, message: "Invalid input"});
             } else if (!doc.userEmail) {
                 res.header("status", "400");
                 console.log("Invalid input 3");
-                res.send("Invalid input");
-            } else if (!doc.posts) {
+                res.send({status: 400, message: "Invalid input"});
+            } else if (!isUserExist) {
                 res.header("status", "400");
                 console.log("Invalid input 4");
-                res.send("Invalid input");
+                res.send({status: 400, message: "User does not exist"});
             } else {
-                const filter = {userID: doc.userID};
-                const options = {upsert: true};
-                const updateDoc = {
-                    $set: {
-                        posts: doc.data,
-                    },
-                };
-
-                const result = await collection.updateOne(
-                    filter,
-                    updateDoc,
-                    options
-                );
+                const result = await collectionPost.insertOne(doc);
                 res.header("status", "200");
                 res.send(result);
                 console.log(
@@ -105,7 +111,7 @@ async function run() {
         app.get("/api/v1/get/data=:userID", async (req, res) => {
             const userID = req.params.userID;
             console.log(userID);
-            const allUserData = await collection.find().toArray();
+            const allUserData = await collectionUser.find().toArray();
             res.header("status", "200");
             res.send(allUserData);
         });
