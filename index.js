@@ -112,7 +112,7 @@ async function run() {
                 if (numberOfElements === 13) {
                     const result = await collectionPost.insertOne(doc);
                     res.header("status", "200");
-                    res.send(result);
+                    res.send({status: 200, message: "Post inserted"});
                     console.log(
                         `A document was inserted with the _id: ${result.insertedId}`
                     );
