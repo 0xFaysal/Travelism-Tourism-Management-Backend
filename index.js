@@ -130,13 +130,15 @@ async function run() {
             const parameter = req.params.parameter;
             console.log(parameter);
             const allUserData = await collectionPost.find().toArray();
+
             if (parameter === "all") {
                 res.header("status", "200");
                 res.send(allUserData);
             } else {
                 const filteredUserData = allUserData.filter(
-                    (user) => user.userID === parameter
+                    (user) => user.userId === parameter
                 );
+                console.log(filteredUserData);
                 res.header("status", "200");
                 res.send(filteredUserData);
             }
