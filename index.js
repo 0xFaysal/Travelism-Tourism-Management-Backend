@@ -177,6 +177,17 @@ async function run() {
             }
         });
 
+        app.get("/api/v1/get/search=:parameter", async (req, res) => {
+            const parameter = req.params.parameter;
+            console.log(parameter);
+            const postCollectionData = await collectionPost
+                .find({tourists_spot_name: {$regex: parameter, $options: "i"}})
+                .toArray();
+            console.log(postCollectionData);
+            res.header("status", "200");
+            res.send(postCollectionData);
+        });
+
         app.put("/api/v1/update/data=:parameter", async (req, res) => {
             const parameter = req.params.parameter;
             const doc = req.body;
