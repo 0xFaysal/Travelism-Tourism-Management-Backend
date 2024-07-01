@@ -30,7 +30,6 @@ async function run() {
         const collectionPost = database.collection("posts");
 
         app.post("/api/v1/insert/user", async (req, res) => {
-            console.log(req.body.userId);
             const doc = req.body;
 
             const allUsers = await collectionUser.find({}).toArray();
@@ -75,7 +74,6 @@ async function run() {
         });
 
         app.post("/api/v1/insert/post", async (req, res) => {
-            console.log(req.body.userId);
             const doc = req.body;
             const allUsers = await collectionUser.find({}).toArray();
 
@@ -128,7 +126,6 @@ async function run() {
 
         app.get("/api/v1/get/data=:parameter", async (req, res) => {
             const parameter = req.params.parameter;
-            console.log(parameter);
             const countryName = [
                 "bangladesh",
                 "thailand",
@@ -153,25 +150,21 @@ async function run() {
                 const filteredUserData = postCollectionData.filter(
                     (user) => user.userId === parameter
                 );
-                // console.log(filteredUserData);
                 res.header("status", "200");
                 res.send(filteredUserData);
             } else if (ObjectId.isValid(parameter)) {
                 const result = await collectionPost.findOne({
                     _id: new ObjectId(parameter),
                 });
-                console.log("hi", result);
                 res.header("status", "200");
                 res.send(result);
             } else if (isCountryExist) {
                 const result = await collectionPost.find().toArray();
-                console.log(result);
                 const filteredCountryData = result.filter(
                     (post) =>
                         post.country_name.toLowerCase() ===
                         parameter.toLowerCase()
                 );
-                console.log(filteredCountryData, isCountryExist);
                 res.header("status", "200");
                 res.send(filteredCountryData);
             }
@@ -179,11 +172,9 @@ async function run() {
 
         app.get("/api/v1/get/search=:parameter", async (req, res) => {
             const parameter = req.params.parameter;
-            console.log(parameter);
             const postCollectionData = await collectionPost
                 .find({tourists_spot_name: {$regex: parameter, $options: "i"}})
                 .toArray();
-            console.log(postCollectionData);
             res.header("status", "200");
             res.send(postCollectionData);
         });
@@ -231,7 +222,6 @@ async function run() {
 
         app.delete("/api/v1/delete/data=:id", async (req, res) => {
             const id = req.params.id;
-            console.log(id, "delete");
             const result = await collectionPost.deleteOne({
                 _id: new ObjectId(id),
             });
@@ -259,8 +249,8 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-    res.send("Hello World!");
-    console.log("Hello World!");
+    res.send("Running...");
+    console.log("From Root this is working fine");
 });
 
 app.listen(port, () => {
