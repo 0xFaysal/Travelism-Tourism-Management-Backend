@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
 // Define the POST method route
 async function run() {
     try {
-        await client.connect();
+        // await client.connect();
         const database = client.db("Travelism");
         const collectionUser = database.collection("users");
         const collectionPost = database.collection("posts");
